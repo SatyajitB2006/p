@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Layout Optimizer | Maruti Suzuki Warehouse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary: #f72585;
+            --success: #4cc9f0;
+            --warning: #fca311;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #1a1c2e;
+            --gray-dark: #343a40;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-light: #f8f9fa;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fa;
+            --border-color: #dee2e6;
+            --card-border-radius: 12px;
+            --element-border-radius: 8px;
+            --transition-speed: 0.3s;
+        }
+
+        .dark-mode {
+            --primary: #5170ff;
+            --primary-light: #56a0ff;
+            --primary-dark: #4c14d3;
+            --bg-primary: #1a1c2e;
+            --bg-secondary: #282b40;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --border-color: #3d4358;
+            --gray-light: #3d4358;
+            --gray: #adb5bd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            transition: all var(--transition-speed);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--gray-light);
+            transform: rotate(360deg);
+        }
+
+        .dark-mode .theme-toggle i {
+            transform: rotate(180deg);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--bg-primary);
+            border-radius: var(--card-border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            grid-column: span 4;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--element-border-radius);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-secondary);
+            padding: 15px;
+            border-radius: var(--element-border-radius);
+            text-align: center;
+            transition: transform var(--transition-speed);
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        .update-feed {
+            padding: 15px;
+        }
+
+        .update-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color var(--transition-speed);
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-item:hover {
+            background-color: var(--bg-secondary);
+            padding-left: 10px;
+            border-radius: var(--element-border-radius);
+        }
+
+        .update-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .update-content {
+            flex: 1;
+        }
+
+        .update-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .update-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .layout-container {
+            grid-column: span 8;
+            background-color: var(--bg-primary);
+            border-radius: var(--card-border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            width: 100%;
+            min-height: 500px;
+        }
+
+        .layout-toolbar {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .layout-tool {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--element-border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .layout-tool.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .layout-tool:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .layout-content {
+            flex: 1;
+            padding: 0;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #warehouse3d {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        .part-info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 300px;
+            border-left: 4px solid var(--primary);
+            display: none;
+            z-index: 100;
+        }
+
+        .part-info-title {
+            margin: 0 0 10px 0;
+            color: var(--primary-light);
+            font-size: 1.2em;
+        }
+
+        .part-info-text {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .warehouse-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .warehouse-btn {
+            pointer-events: auto;
+            background-color: rgba(67, 97, 238, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .warehouse-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Fullscreen styles */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background-color: var(--bg-primary);
+        }
+
+        .fullscreen-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .fullscreen-close:hover {
+            background-color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .card {
+                grid-column: span 6;
+            }
+            
+            .layout-container {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                grid-column: span 12;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .card-actions {
+                align-self: flex-end;
+            }
+            
+            .warehouse-controls {
+                flex-direction: column;
+                bottom: 10px;
+                left: 10px;
+            }
+            
+            .part-info-panel {
+                max-width: 200px;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-header">
+            <h1 class="page-title">Maruti Suzuki Warehouse Optimization</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Current Efficiency</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-outline"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Space Utilization</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 7% from last week
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">1,280m</div>
+                        <div class="stat-label">Avg. Travel Distance</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-down"></i> 5% improvement
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">92/hr</div>
+                        <div class="stat-label">Picks Per Hour</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 15% from last month
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Real-Time Updates</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-outline"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                </div>
+                <div class="update-feed">
+                    <div class="update-item">
+                        <div class="update-icon"><i class="fas fa-box"></i></div>
+                        <div class="update-content">
+                            <div class="update-time">5 minutes ago</div>
+                            <div class="update-text">Engine parts relocated to Zone C based on demand</div>
+                        </div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon"><i class="fas fa-route"></i></div>
+                        <div class="update-content">
+                            <div class="update-time">18 minutes ago</div>
+                            <div class="update-text">Pick path optimized for Order #5732 - saved 38m of travel</div>
+                        </div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon"><i class="fas fa-robot"></i></div>
+                        <div class="update-content">
+                            <div class="update-time">35 minutes ago</div>
+                            <div class="update-text">AGV paths updated for new layout in Section B</div>
+                        </div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="update-content">
+                            <div class="update-time">1 hour ago</div>
+                            <div class="update-text">Congestion detected in Aisle 5 - suggestion generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Optimization Controls</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" id="runOptimization"><i class="fas fa-play"></i> Run Now</button>
+                    </div>
+                </div>
+                <div class="optimization-controls">
+                    <div class="control-group">
+                        <label class="control-label">Optimization Focus</label>
+                        <select class="control-input">
+                            <option>Maximize Efficiency</option>
+                            <option>Reduce Labor Costs</option>
+                            <option>Minimize Travel Time</option>
+                            <option>Increase Safety</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Time Horizon</label>
+                        <select class="control-input">
+                            <option>Next 24 Hours</option>
+                            <option>Next 7 Days</option>
+                            <option>Next 30 Days</option>
+                            <option>Seasonal (Q4 Focus)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Constraint Level</label>
+                        <select class="control-input">
+                            <option>No Constraints</option>
+                            <option>Minimal Changes</option>
+                            <option>Budget Limited</option>
+                            <option>Safety First</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-container">
+                <div class="layout-toolbar">
+                    <div class="layout-tool active" data-view="3d" title="3D View">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="layout-tool" data-view="heatmap" title="Heatmap View">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="layout-tool" data-view="flow" title="Flow Analysis">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="layout-tool" data-view="metrics" title="Key Metrics">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <div class="layout-content">
+                    <div id="warehouse3d"></div>
+                    <div class="part-info-panel" id="partInfo">
+                        <h3 class="part-info-title" id="partName">Part Name</h3>
+                        <p class="part-info-text" id="partDescription">Description will appear here</p>
+                        <p class="part-info-text" id="partSku">SKU: XXXXXX</p>
+                        <p class="part-info-text" id="partLocation">Location: Rack A-12</p>
+                    </div>
+                    <div class="warehouse-controls">
+                        <button class="warehouse-btn" id="toggleRotation">
+                            <i class="fas fa-pause"></i> Pause Rotation
+                        </button>
+                        <button class="warehouse-btn" id="resetView">
+                            <i class="fas fa-sync-alt"></i> Reset View
+                        </button>
+                    </div>
+                    <button class="fullscreen-btn" id="fullscreenBtn" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loading-spinner"></div>
+                        <p>Loading 3D Warehouse Model...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Active Recommendations</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-outline"><i class="fas fa-filter"></i> Filter</button>
+                    </div>
+                </div>
+                <div class="recommendations-list">
+                    <div class="recommendation">
+                        <div class="recommendation-icon"><i class="fas fa-arrows-alt-h"></i></div>
+                        <div class="recommendation-content">
+                            <h4 class="recommendation-title">Widen Aisle 5 by 24 inches</h4>
+                            <p class="recommendation-desc">Reduces forklift congestion during peak hours (9am-3pm)</p>
+                            <div class="recommendation-meta">
+                                <span class="recommendation-priority priority-high">High Priority</span>
+                                <span>Projected: 27% wait time reduction</span>
+                            </div>
+                        </div>
+                        <div class="recommendation-actions">
+                            <button class="btn btn-outline recommendation-detail-btn" data-title="Widen Aisle 5" data-priority="high" data-impact="27% wait time reduction">Details</button>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <div class="recommendation-icon"><i class="fas fa-box-open"></i></div>
+                        <div class="recommendation-content">
+                            <h4 class="recommendation-title">Relocate Engine Components</h4>
+                            <p class="recommendation-desc">Move high-demand engine parts closer to packing stations</p>
+                            <div class="recommendation-meta">
+                                <span class="recommendation-priority priority-medium">Medium Priority</span>
+                                <span>Projected: 22% faster picking</span>
+                            </div>
+                        </div>
+                        <div class="recommendation-actions">
+                            <button class="btn btn-outline recommendation-detail-btn" data-title="Relocate Engine Components" data-priority="medium" data-impact="22% faster picking">Details</button>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <div class="recommendation-icon"><i class="fas fa-battery-three-quarters"></i></div>
+                        <div class="recommendation-content">
+                            <h4 class="recommendation-title">Optimize AGV Charging Stations</h4>
+                            <p class="recommendation-desc">Add 3 charging stations in Zone C to reduce downtime</p>
+                            <div class="recommendation-meta">
+                                <span class="recommendation-priority priority-low">Low Priority</span>
+                                <span>Projected: 15% uptime increase</span>
+                            </div>
+                        </div>
+                        <div class="recommendation-actions">
+                            <button class="btn btn-outline recommendation-detail-btn" data-title="Optimize AGV Charging Stations" data-priority="low" data-impact="15% uptime increase">Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen container (hidden by default) -->
+    <div id="fullscreenContainer" class="fullscreen-mode" style="display: none;">
+        <div id="fullscreen3d"></div>
+        <div class="part-info-panel" id="fullscreenPartInfo">
+            <h3 class="part-info-title" id="fullscreenPartName">Part Name</h3>
+            <p class="part-info-text" id="fullscreenPartDescription">Description will appear here</p>
+            <p class="part-info-text" id="fullscreenPartSku">SKU: XXXXXX</p>
+            <p class="part-info-text" id="fullscreenPartLocation">Location: Rack A-12</p>
+        </div>
+        <div class="warehouse-controls">
+            <button class="warehouse-btn" id="fullscreenToggleRotation">
+                <i class="fas fa-pause"></i> Pause Rotation
+            </button>
+            <button class="warehouse-btn" id="fullscreenResetView">
+                <i class="fas fa-sync-alt"></i> Reset View
+            </button>
+        </div>
+        <button class="fullscreen-close" id="fullscreenCloseBtn" title="Exit Fullscreen">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Recommendation Detail Modal -->
+    <div class="detail-modal" id="recommendationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Recommendation Details</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h4 class="section-title">Description</h4>
+                    <p id="modalDescription">Detailed description of the recommendation will appear here.</p>
+                </div>
+                <div class="modal-section">
+                    <h4 class="section-title">Impact Analysis</h4>
+                    <div class="impact-metrics">
+                        <div class="metric-card">
+                            <div class="metric-title">Priority</div>
+                            <div class="metric-value" id="modalPriority">High</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Projected Impact</div>
+                            <div class="metric-value" id="modalImpact">23% improvement</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-section">
+                    <h4 class="section-title">Implementation Steps</h4>
+                    <ol id="implementationSteps">
+                        <li>Step 1: Identify current layout constraints</li>
+                        <li>Step 2: Calculate optimal new positions</li>
+                        <li>Step 3: Schedule implementation during low activity</li>
+                        <li>Step 4: Verify improvements post-implementation</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline">View Related Metrics</button>
+                <button class="btn btn-primary">Schedule Implementation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        let isDark = false;
+
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            isDark = true;
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            if (isDark) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
+        // Three.js Warehouse Model
+        let scene, camera, renderer, controls;
+        let fullscreenScene, fullscreenCamera, fullscreenRenderer, fullscreenControls;
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const fullscreenContainer = document.getElementById('fullscreenContainer');
+        const fullscreen3d = document.getElementById('fullscreen3d');
+        const warehouseContainer = document.getElementById('warehouse3d');
+        const partInfoPanel = document.getElementById('partInfo');
+        const partName = document.getElementById('partName');
+        const partDescription = document.getElementById('partDescription');
+        const partSku = document.getElementById('partSku');
+        const partLocation = document.getElementById('partLocation');
+
+        function init3DModel() {
+            // Create main scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            // Create main camera
+            camera = new THREE.PerspectiveCamera(60, warehouseContainer.clientWidth / warehouseContainer.clientHeight, 0.1, 1000);
+            camera.position.set(50, 40, 50);
+            
+            // Create main renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(warehouseContainer.clientWidth, warehouseContainer.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            warehouseContainer.appendChild(renderer.domElement);
+            
+            // Add main orbit controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+            
+            // Setup lights
+            setupLights(scene);
+            
+            // Create warehouse structure
+            createWarehouse(scene);
+            
+            // Create racks and parts
+            createRacksAndParts(scene);
+            
+            // Create forklifts
+            createForklifts(scene);
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation loop
+            animate();
+            
+            // Hide loading overlay after a short delay
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 300);
+            }, 1500);
+        }
+
+        function setupLights(targetScene) {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            targetScene.add(ambientLight);
+            
+            // Directional light (sun)
+            const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            sunLight.position.set(50, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            targetScene.add(sunLight);
+            
+            // Add ceiling lights
+            const ceilingLight1 = new THREE.PointLight(0xffffff, 0.6, 30);
+            ceilingLight1.position.set(0, 18, 0);
+            targetScene.add(ceilingLight1);
+            
+            const ceilingLight2 = new THREE.PointLight(0xffffff, 0.6, 30);
+            ceilingLight2.position.set(20, 18, 20);
+            targetScene.add(ceilingLight2);
+        }
+
+        function createWarehouse(targetScene) {
+            const width = 80;
+            const length = 120;
+            const height = 20;
+            
+            // Floor
+            const floorGeometry = new THREE.PlaneGeometry(width, length);
+            const floorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x808080,
+                roughness: 0.8
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            targetScene.add(floor);
+            
+            // Walls
+            const wallMaterial = new THREE.MeshStandardMaterial({
+                color: 0xcccccc,
+                roughness: 0.6
+            });
+            
+            // Back wall
+            const backWall = new THREE.Mesh(
+                new THREE.BoxGeometry(width, height, 0.5),
+                wallMaterial
+            );
+            backWall.position.set(0, height/2, -length/2);
+            backWall.receiveShadow = true;
+            targetScene.add(backWall);
+            
+            // Left wall
+            const leftWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, height, length),
+                wallMaterial
+            );
+            leftWall.position.set(-width/2, height/2, 0);
+            targetScene.add(leftWall);
+            
+            // Right wall
+            const rightWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, height, length),
+                wallMaterial
+            );
+            rightWall.position.set(width/2, height/2, 0);
+            targetScene.add(rightWall);
+            
+            // Front opening
+            const frontWallLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(width/2 - 10, height, 0.5),
+                wallMaterial
+            );
+            frontWallLeft.position.set(-width/4 - 5, height/2, length/2);
+            targetScene.add(frontWallLeft);
+            
+            const frontWallRight = new THREE.Mesh(
+                new THREE.BoxGeometry(width/2 - 10, height, 0.5),
+                wallMaterial
+            );
+            frontWallRight.position.set(width/4 + 5, height/2, length/2);
+            targetScene.add(frontWallRight);
+            
+            // Loading dock
+            const dockGeometry = new THREE.BoxGeometry(30, 1, 40);
+            const dockMaterial = new THREE.MeshStandardMaterial({
+                color: 0x555555
+            });
+            const dock = new THREE.Mesh(dockGeometry, dockMaterial);
+            dock.position.set(0, 0.5, length/2 - 20);
+            targetScene.add(dock);
+            
+            // Add some components outside
+            createOutsideComponents(targetScene, width, length);
+        }
+
+        function createOutsideComponents(targetScene, width, length) {
+            // Storage containers
+            const containerMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4682B4,
+                roughness: 0.7
+            });
+            
+            for (let i = 0; i < 3; i++) {
+                const container = new THREE.Mesh(
+                    new THREE.BoxGeometry(5, 3, 10),
+                    containerMaterial
+                );
+                container.position.set(
+                    -width/2 - 8 + i * 7,
+                    1.5,
+                    -length/2 + 15
+                );
+                container.rotation.y = Math.PI/2;
+                targetScene.add(container);
+            }
+            
+            // Pallet stacks
+            const palletMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B4513
+            });
+            
+            for (let i = 0; i < 4; i++) {
+                const palletStack = new THREE.Group();
+                for (let j = 0; j < 3; j++) {
+                    const pallet = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.2, 0.2, 1.2),
+                        palletMaterial
+                    );
+                    pallet.position.set(
+                        width/2 + 5 + i * 3,
+                        0.1 + j * 0.3,
+                        -length/2 + 20
+                    );
+                    palletStack.add(pallet);
+                }
+                targetScene.add(palletStack);
+            }
+            
+            // Large engine components
+            const engineMaterial = new THREE.MeshStandardMaterial({
+                color: 0x333333,
+                metalness: 0.8,
+                roughness: 0.4
+            });
+            
+            const largeEngine = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 1.5, 2),
+                engineMaterial
+            );
+            largeEngine.position.set(
+                width/2 + 8,
+                0.75,
+                length/2 - 30
+            );
+            targetScene.add(largeEngine);
+            
+            // Add label
+            const engineLabel = createTextLabel("Engine Assembly", 0xffffff);
+            engineLabel.position.set(
+                width/2 + 8,
+                2.5,
+                length/2 - 30
+            );
+            targetScene.add(engineLabel);
+        }
+
+        function createTextLabel(text, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 256;
+            const context = canvas.getContext('2d');
+            
+            context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            context.font = 'Bold 60px Arial';
+            context.textAlign = 'center';
+            context.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+            context.fillText(text, canvas.width/2, canvas.height/2 + 20);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(5, 2.5, 1);
+            
+            return sprite;
+        }
+
+        function createRacksAndParts(targetScene) {
+            const rackWidth = 10;
+            const rackDepth = 4;
+            const rackHeight = 15;
+            
+            // Create 4 rows of racks
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const x = -40 + 15 + col * (rackWidth + 5);
+                    const z = -60 + 20 + row * (rackDepth + 10);
+                    createRack(targetScene, x, z, rackWidth, rackHeight, rackDepth, row, col);
+                }
+            }
+        }
+
+        function createRack(targetScene, x, z, width, height, depth, row, col) {
+            const rackGroup = new THREE.Group();
+            
+            // Rack frame
+            const frameMaterial = new THREE.MeshStandardMaterial({
+                color: 0x333333
+            });
+            
+            // Vertical supports
+            const supportGeometry = new THREE.BoxGeometry(0.3, height, 0.3);
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    const support = new THREE.Mesh(supportGeometry, frameMaterial);
+                    support.position.set(
+                        x + (i * width) - width/2,
+                        height/2,
+                        z + (j * depth) - depth/2
+                    );
+                    support.castShadow = true;
+                    rackGroup.add(support);
+                }
+            }
+            
+            // Shelves (5 levels)
+            const shelfMaterial = new THREE.MeshStandardMaterial({
+                color: 0x555555
+            });
+            const shelfGeometry = new THREE.BoxGeometry(width - 0.4, 0.1, depth - 0.4);
+            
+            for (let level = 0; level < 5; level++) {
+                const shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
+                shelf.position.set(
+                    x,
+                    (level * height/5) + 1.5,
+                    z
+                );
+                shelf.castShadow = true;
+                shelf.receiveShadow = true;
+                rackGroup.add(shelf);
+                
+                // Add parts to this shelf
+                addPartsToShelf(targetScene, shelf, width, depth, level, row, col);
+            }
+            
+            rackGroup.position.y = 0;
+            targetScene.add(rackGroup);
+        }
+
+        function addPartsToShelf(targetScene, shelf, width, depth, level, row, col) {
+            const partTypes = [
+                {
+                    name: "Engine Block",
+                    description: "K12M 1.2L Petrol Engine",
+                    sku: "ENG-K12M-001",
+                    color: 0x8B0000,
+                    size: { x: 1.8, y: 0.8, z: 1.2 }
+                },
+                {
+                    name: "Transmission",
+                    description: "5-Speed Manual Transmission",
+                    sku: "TRN-5M-202",
+                    color: 0x006400,
+                    size: { x: 1.5, y: 0.7, z: 1.0 }
+                },
+                {
+                    name: "ECU Unit",
+                    description: "Engine Control Unit",
+                    sku: "ECU-GEN3-305",
+                    color: 0x1E90FF,
+                    size: { x: 0.3, y: 0.2, z: 0.2 }
+                },
+                {
+                    name: "Brake Disc",
+                    description: "Vented Front Brake Disc",
+                    sku: "BRK-DISC-F-410",
+                    color: 0x696969,
+                    size: { x: 0.4, y: 0.1, z: 0.4 }
+                }
+            ];
+            
+            // Add 2-4 parts per shelf
+            const partsCount = 2 + Math.floor(Math.random() * 3);
+            
+            for (let i = 0; i < partsCount; i++) {
+                const partType = partTypes[Math.floor(Math.random() * partTypes.length)];
+                const partMaterial = new THREE.MeshStandardMaterial({
+                    color: partType.color,
+                    roughness: 0.5,
+                    metalness: 0.5
+                });
+                
+                const part = new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        partType.size.x,
+                        partType.size.y,
+                        partType.size.z
+                    ),
+                    partMaterial
+                );
+                
+                // Position parts on the shelf
+                const shelfY = shelf.position.y + partType.size.y/2 + 0.05;
+                const partX = shelf.position.x - width/2 + 1 + (i % 3) * (width - 2)/3;
+                const partZ = shelf.position.z - depth/2 + 1 + Math.floor(i/3) * (depth - 2)/2;
+                
+                part.position.set(partX, shelfY, partZ);
+                part.castShadow = true;
+                
+                // Add part info
+                part.userData = {
+                    type: 'part',
+                    name: partType.name,
+                    description: partType.description,
+                    sku: partType.sku,
+                    location: `Rack ${String.fromCharCode(65 + row)}-${col + 1}, Level ${level + 1}`
+                };
+                
+                targetScene.add(part);
+            }
+        }
+
+        function createForklifts(targetScene) {
+            // Forklift 1
+            const forklift1 = createForklift(-20, -40, Math.PI/4);
+            targetScene.add(forklift1);
+            
+            // Forklift 2
+            const forklift2 = createForklift(25, -20, -Math.PI/6);
+            targetScene.add(forklift2);
+        }
+
+        function createForklift(x, z, rotationY) {
+            const forkliftGroup = new THREE.Group();
+            
+            // Base
+            const baseGeometry = new THREE.BoxGeometry(3, 1, 1.5);
+            const baseMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xFF4500
+            });
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = 0.5;
+            base.castShadow = true;
+            forkliftGroup.add(base);
+            
+            // Cabin
+            const cabinGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            const cabinMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF
+            });
+            const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+            cabin.position.set(-0.5, 1.25, 0);
+            cabin.castShadow = true;
+            forkliftGroup.add(cabin);
+            
+            // Forks
+            const forkGeometry = new THREE.BoxGeometry(0.2, 0.05, 2);
+            const forkMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xC0C0C0
+            });
+            
+            for (let i = 0; i < 2; i++) {
+                const fork = new THREE.Mesh(forkGeometry, forkMaterial);
+                fork.position.set(1.5, 0.25, i * 0.3 - 0.15);
+                fork.castShadow = true;
+                forkliftGroup.add(fork);
+            }
+            
+            forkliftGroup.position.set(x, 0, z);
+            forkliftGroup.rotation.y = rotationY;
+            
+            return forkliftGroup;
+        }
+
+        function setupEventListeners() {
+            // Mouse interaction for main view
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            
+            function onMouseClick(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                
+                if (intersects.length > 0 && intersects[0].object.userData.type === 'part') {
+                    const part = intersects[0].object;
+                    partName.textContent = part.userData.name;
+                    partDescription.textContent = part.userData.description;
+                    partSku.textContent = `SKU: ${part.userData.sku}`;
+                    partLocation.textContent = `Location: ${part.userData.location}`;
+                    partInfoPanel.style.display = 'block';
+                }
+            }
+            
+            warehouseContainer.addEventListener('click', onMouseClick, false);
+            
+            // Control buttons for main view
+            document.getElementById('toggleRotation').addEventListener('click', () => {
+                controls.autoRotate = !controls.autoRotate;
+                const icon = document.querySelector('#toggleRotation i');
+                if (controls.autoRotate) {
+                    icon.className = 'fas fa-pause';
+                    document.getElementById('toggleRotation').innerHTML = '<i class="fas fa-pause"></i> Pause Rotation';
+                } else {
+                    icon.className = 'fas fa-play';
+                    document.getElementById('toggleRotation').innerHTML = '<i class="fas fa-play"></i> Resume Rotation';
+                }
+            });
+            
+            document.getElementById('resetView').addEventListener('click', () => {
+                controls.reset();
+                camera.position.set(50, 40, 50);
+                controls.update();
+            });
+            
+            // Fullscreen button
+            document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+            
+            // Fullscreen close button
+            document.getElementById('fullscreenCloseBtn').addEventListener('click', toggleFullscreen);
+        }
+
+        function onWindowResize() {
+            // Update main view
+            camera.aspect = warehouseContainer.clientWidth / warehouseContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(warehouseContainer.clientWidth, warehouseContainer.clientHeight);
+            
+            // Update fullscreen view if active
+            if (fullscreenRenderer) {
+                fullscreenCamera.aspect = window.innerWidth / window.innerHeight;
+                fullscreenCamera.updateProjectionMatrix();
+                fullscreenRenderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!fullscreenContainer.style.display || fullscreenContainer.style.display === 'none') {
+                // Enter fullscreen
+                fullscreenContainer.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                // Create fullscreen scene if it doesn't exist
+                if (!fullscreenRenderer) {
+                    // Create fullscreen scene
+                    fullscreenScene = new THREE.Scene();
+                    fullscreenScene.background = new THREE.Color(0xf0f0f0);
+                    
+                    // Create fullscreen camera
+                    fullscreenCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    fullscreenCamera.position.copy(camera.position);
+                    fullscreenCamera.rotation.copy(camera.rotation);
+                    
+                    // Create fullscreen renderer
+                    fullscreenRenderer = new THREE.WebGLRenderer({ antialias: true });
+                    fullscreenRenderer.setPixelRatio(window.devicePixelRatio);
+                    fullscreenRenderer.setSize(window.innerWidth, window.innerHeight);
+                    fullscreenRenderer.shadowMap.enabled = true;
+                    fullscreenRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                    fullscreen3d.appendChild(fullscreenRenderer.domElement);
+                    
+                    // Add fullscreen orbit controls
+                    fullscreenControls = new THREE.OrbitControls(fullscreenCamera, fullscreenRenderer.domElement);
+                    fullscreenControls.enableDamping = true;
+                    fullscreenControls.dampingFactor = 0.05;
+                    fullscreenControls.autoRotate = controls.autoRotate;
+                    fullscreenControls.autoRotateSpeed = 0.5;
+                    
+                    // Clone the main scene to fullscreen
+                    cloneScene(scene, fullscreenScene);
+                    
+                    // Setup fullscreen controls
+                    document.getElementById('fullscreenToggleRotation').addEventListener('click', () => {
+                        fullscreenControls.autoRotate = !fullscreenControls.autoRotate;
+                        const icon = document.querySelector('#fullscreenToggleRotation i');
+                        if (fullscreenControls.autoRotate) {
+                            icon.className = 'fas fa-pause';
+                            document.getElementById('fullscreenToggleRotation').innerHTML = '<i class="fas fa-pause"></i> Pause Rotation';
+                        } else {
+                            icon.className = 'fas fa-play';
+                            document.getElementById('fullscreenToggleRotation').innerHTML = '<i class="fas fa-play"></i> Resume Rotation';
+                        }
+                    });
+                    
+                    document.getElementById('fullscreenResetView').addEventListener('click', () => {
+                        fullscreenControls.reset();
+                        fullscreenCamera.position.set(50, 40, 50);
+                        fullscreenControls.update();
+                    });
+                    
+                    // Mouse interaction for fullscreen view
+                    fullscreen3d.addEventListener('click', (event) => {
+                        const mouse = new THREE.Vector2();
+                        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                        
+                        const raycaster = new THREE.Raycaster();
+                        raycaster.setFromCamera(mouse, fullscreenCamera);
+                        const intersects = raycaster.intersectObjects(fullscreenScene.children, true);
+                        
+                        if (intersects.length > 0 && intersects[0].object.userData.type === 'part') {
+                            const part = intersects[0].object;
+                            document.getElementById('fullscreenPartName').textContent = part.userData.name;
+                            document.getElementById('fullscreenPartDescription').textContent = part.userData.description;
+                            document.getElementById('fullscreenPartSku').textContent = `SKU: ${part.userData.sku}`;
+                            document.getElementById('fullscreenPartLocation').textContent = `Location: ${part.userData.location}`;
+                            document.getElementById('fullscreenPartInfo').style.display = 'block';
+                        }
+                    });
+                } else {
+                    // Update camera position from main view
+                    fullscreenCamera.position.copy(camera.position);
+                    fullscreenCamera.rotation.copy(camera.rotation);
+                    fullscreenControls.autoRotate = controls.autoRotate;
+                }
+                
+                // Start fullscreen animation
+                animateFullscreen();
+            } else {
+                // Exit fullscreen
+                fullscreenContainer.style.display = 'none';
+                document.body.style.overflow = '';
+                
+                // Update main camera position from fullscreen
+                camera.position.copy(fullscreenCamera.position);
+                camera.rotation.copy(fullscreenCamera.rotation);
+                controls.autoRotate = fullscreenControls.autoRotate;
+            }
+        }
+
+        function cloneScene(sourceScene, targetScene) {
+            // Clear target scene first
+            while(targetScene.children.length > 0) { 
+                targetScene.remove(targetScene.children[0]); 
+            }
+            
+            // Clone all objects
+            sourceScene.children.forEach(child => {
+                targetScene.add(child.clone());
+            });
+            
+            // Setup lights for fullscreen scene
+            setupLights(targetScene);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function animateFullscreen() {
+            if (fullscreenContainer.style.display === 'block') {
+                requestAnimationFrame(animateFullscreen);
+                fullscreenControls.update();
+                fullscreenRenderer.render(fullscreenScene, fullscreenCamera);
+            }
+        }
+
+        // Initialize 3D model when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            init3DModel();
+            
+            // Layout View Toggle
+            const viewButtons = document.querySelectorAll('.layout-tool');
+            
+            viewButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    viewButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                });
+            });
+            
+            // Recommendation Details Modal
+            const detailButtons = document.querySelectorAll('.recommendation-detail-btn');
+            const recommendationModal = document.getElementById('recommendationModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const modalPriority = document.getElementById('modalPriority');
+            const modalImpact = document.getElementById('modalImpact');
+            const closeModal = document.getElementById('closeModal');
+
+            detailButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const title = button.getAttribute('data-title');
+                    const priority = button.getAttribute('data-priority');
+                    const impact = button.getAttribute('data-impact');
+                    
+                    // Set modal content based on clicked recommendation
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = `Detailed analysis and implementation plan for ${title.toLowerCase()}. This recommendation is designed to optimize your warehouse operations by addressing specific inefficiencies identified through our AI analysis.`;
+                    modalPriority.textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+                    modalImpact.textContent = impact;
+                    
+                    // Set priority color
+                    modalPriority.className = 'metric-value';
+                    if (priority === 'high') {
+                        modalPriority.classList.add('priority-high');
+                    } else if (priority === 'medium') {
+                        modalPriority.classList.add('priority-medium');
+                    } else {
+                        modalPriority.classList.add('priority-low');
+                    }
+                    
+                    // Show modal
+                    recommendationModal.classList.add('active');
+                });
+            });
+
+            closeModal.addEventListener('click', () => {
+                recommendationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            recommendationModal.addEventListener('click', (e) => {
+                if (e.target === recommendationModal) {
+                    recommendationModal.classList.remove('active');
+                }
+            });
+
+            // Run Optimization Button
+            const runOptimizationBtn = document.getElementById('runOptimization');
+            runOptimizationBtn.addEventListener('click', () => {
+                runOptimizationBtn.innerHTML = '<i class="fas fa-cog fa-spin"></i> Optimizing...';
+                runOptimizationBtn.disabled = true;
+                
+                // Simulate optimization process
+                setTimeout(() => {
+                    showNotification('Optimization complete! Projected efficiency gain: 22%');
+                    runOptimizationBtn.innerHTML = '<i class="fas fa-check"></i> Completed';
+                    
+                    setTimeout(() => {
+                        runOptimizationBtn.innerHTML = '<i class="fas fa-play"></i> Run Now';
+                        runOptimizationBtn.disabled = false;
+                    }, 3000);
+                }, 2000);
+            });
+
+            // Show notification function
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.innerHTML = `
+                    <div style="position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; padding: 1rem 1.5rem; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; animation: slideIn 0.3s ease;">
+                        ${message}
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Remove after delay
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+
+            // Simulate real-time updates
+            function addUpdate() {
+                const updates = [
+                    {
+                        icon: 'fas fa-box',
+                        time: 'Just now',
+                        text: 'Engine parts demand increased - relocation suggested'
+                    },
+                    {
+                        icon: 'fas fa-route',
+                        time: '5 minutes ago',
+                        text: 'New pick path calculated for Order #5732'
+                    },
+                    {
+                        icon: 'fas fa-robot',
+                        time: '22 minutes ago',
+                        text: 'AGV #3 battery optimization complete'
+                    },
+                    {
+                        icon: 'fas fa-exclamation-triangle',
+                        time: '45 minutes ago',
+                        text: 'Low stock alert for Transmission parts in Zone D'
+                    }
+                ];
+                
+                const randomUpdate = updates[Math.floor(Math.random() * updates.length)];
+                const updateFeed = document.querySelector('.update-feed');
+                
+                if (updateFeed) {
+                    const updateItem = document.createElement('div');
+                    updateItem.className = 'update-item';
+                    updateItem.innerHTML = `
+                        <div class="update-icon"><i class="${randomUpdate.icon}"></i></div>
+                        <div class="update-content">
+                            <div class="update-time">${randomUpdate.time}</div>
+                            <div class="update-text">${randomUpdate.text}</div>
+                        </div>
+                    `;
+                    updateItem.style.animation = 'fadeIn 0.5s ease';
+                    updateFeed.insertBefore(updateItem, updateFeed.firstChild);
+                    
+                    // Remove oldest if more than 6
+                    if (updateFeed.children.length > 6) {
+                        updateFeed.removeChild(updateFeed.lastChild);
+                    }
+                }
+            }
+
+            // Add updates periodically
+            setInterval(addUpdate, 15000);
+        });
+    </script>
+</body>
+</html>
